@@ -2,10 +2,13 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Friday Night Funkin': Psych Engine" file="PsychEngine" packageName="com.shadowmario.psychengine" package="com.shadowmario.psychengine" main="Main" version="0.2.7" company="ShadowMario" />
+	<app title="Dr Futtershy" file="PsychEngine" packageName="com.shadowmario.psychengine" package="com.shadowmario.psychengine" main="Main" version="0.2.7" company="ShadowMario" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
+
+	<!-- NOTE TO SELF: DISABLE THIS IF ISSUES ARE FOUND -->
+	<haxedef name="LINC_LUA_RELATIVE_DYNAMIC_LIB"/> <!-- stable luas PUT AFTER FIRST LINE WITH APP NAME AND ETC -->
 
 	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
 		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"-->
@@ -39,20 +42,24 @@
 	<set name="BUILD_DIR" value="export/32bit" if="32bits" />
 
 	<classpath name="source" />
+	
+	<!-- PSYCH ENGINE CUSTOMIZATION -->
+	<define name="MODS_ALLOWED" if="desktop || android"/>
+	<define name="LUA_ALLOWED" if="windows || android"/>
+	<define name="ACHIEVEMENTS_ALLOWED" />
+	<define name="VIDEOS_ALLOWED" if="web || desktop || android" unless="32bits"/>
+	<define name="PSYCH_WATERMARKS"/> <!-- DELETE THIS TO REMOVE WATERMARKS ON TITLE SCREEN -->
+	<define name="TITLE_SCREEN_EASTER_EGG" if="officialBuild"/> <!-- DELETE THE if="officialBuild" for enabling this on an unofficial build -->
 
 	<assets path="assets/preload" rename="assets" exclude="*.ogg" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3"  unless="web"/>
-	
-	<!-- PSYCH ENGINE CUSTOMIZATION -->
-	<define name="MODS_ALLOWED" if="desktop || android" />
-	<define name="LUA_ALLOWED" if="windows || android" />
-	<define name="ACHIEVEMENTS_ALLOWED" />
+	<section if="TITLE_SCREEN_EASTER_EGG">
+		<assets path="assets/secrets" rename="assets" exclude="*.ogg" if="web"/>
+		<assets path="assets/secrets" rename="assets" exclude="*.mp3"  unless="web"/>
+	</section>
 
 	<!-- DONT ENABLE THIS -->
 	<define name="CHECK_FOR_UPDATES" if="desktop officialBuild"/>
-
-	<!-- Mobile Shit -->
-	<define name="mobileC" if="mobile"/>
 
 	<!-- <define name="PRELOAD_ALL" /> -->
 	<define name="PRELOAD_ALL" unless="web" />
@@ -78,7 +85,10 @@
 		<library name="week5"         preload="false" />
 		<library name="week6"         preload="false" />
 	</section>
-
+	
+	<assets path="plugins/"             rename=''               if="VIDEOS_ALLOWED windows" />
+	<assets path="dlls/"                rename=''               if="VIDEOS_ALLOWED windows" />
+	<assets path="assets/videos"        library="videos"        if="VIDEOS_ALLOWED"/>
 	<assets path="assets/songs"         library="songs"         exclude="*.ogg" if="web"/>
 	<assets path="assets/songs"         library="songs"         exclude="*.mp3" unless="web"/>
 	<assets path="assets/shared"        library="shared"        exclude="*.ogg" if="web"/>
@@ -94,8 +104,11 @@
 	<assets path="assets/week6"         library="week6"         exclude="*.ogg" if="web"/>
 	<assets path="assets/week6"         library="week6"         exclude="*.mp3" unless="web"/>
 	
+	<assets path='example_mods' rename='mods' embed='false' if="MODS_ALLOWED"/>
 	<assets path='art/readme.txt' rename='do NOT readme.txt' />
 	<!-- <template path='mods' /> -->
+
+	<!--assets path='example_mods/trickyrecharts' delete='true' unless='MODPACK'/-->
 	
 	<!-- assets path="CHANGELOG.md" rename='changelog.txt' -->
 
@@ -118,8 +131,14 @@
 	<haxelib name="flixel-ui" />
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
 	<haxelib name="faxe" if='switch'/>
+	<!--<haxelib name="polymod"/> -->
 	<haxelib name="discord_rpc" if="desktop"/>
-	<haxelib name="extension-webview"/>
+	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
+        <haxelib name="extension-videoview" if="android"/>
+        <haxelib name="AndroidTools" if="android"/>
+
+        <config:android permission="android.permission.READ_EXTERNAL_STORAGE" if="android"/>
+        <config:android permission="android.permission.WRITE_EXTERNAL_STORAGE" if="android"/>
 
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
@@ -158,6 +177,10 @@
 
 	<!--Enable this for Nape release builds for a serious peformance improvement-->
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
+
+	<!-- Akways enable Null Object Reference check -->
+	<haxedef name="HXCPP_CHECK_POINTER" if="release" />
+	<haxedef name="HXCPP_STACK_LINE" if="release" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 
